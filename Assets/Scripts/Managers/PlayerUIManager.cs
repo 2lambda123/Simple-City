@@ -58,6 +58,15 @@ public class PlayerUIManager : MonoBehaviour {
 		isFlashing = false;
 	}
 	
+	
+	
+	public void GameOver() {
+		if( !isGamePlayable )
+			return;
+		isGamePlayable = false;
+		StartCoroutine( GameOverDisplay() );
+	}
+	
 	IEnumerator GameOverDisplay() {
 		VignetteAndChromaticAberration vignette = GetComponent<VignetteAndChromaticAberration>();
 		vignette.enabled = true;
@@ -69,28 +78,23 @@ public class PlayerUIManager : MonoBehaviour {
 		for( float timer = 0f; timer > gameoverDelay; timer += Time.deltaTime) {
 // 			Debug.Log( "flashing " + timer );
 			ratio = timer / gameoverDelay;
-// 			Debug.Log( Mathf.Lerp( prevExposure, flashExposurePeak, flashTransition.Evaluate( ratio ) ) );
+// 			Debug.Log( Mathf.Lerp( prevExposure, flashExposurePeak, flashTransition.Evaluate( ratio ) ) );	
 			vignette.blurDistance = Mathf.Lerp( prevBlur, gameoverDOF, gameoverTransition.Evaluate( ratio ) );
 			vignette.blur = Mathf.Lerp( prevBlur, gameoverDOF, gameoverTransition.Evaluate( ratio ) );
 			yield return null;
 		}
 		// go to main menu
-	}
-	
-	public void GameOver() {
-		if( !isGamePlayable )
-			return;
-		isGamePlayable = false;
-		StartCoroutine( GameOverDisplay() );
-	}
-	
+		SetupManager.instance.ShowMainMenu();
+	}	
 
 	void Awake() {
 		instance = this;
 	}
 	
 	void Update() {
-		
+		if( Input.GetKeyDown(KeyCode.Escape) ) {
+			SetupManager.instance.ShowMainMenu();
+		}
 	}
 	
 	void Start() {
